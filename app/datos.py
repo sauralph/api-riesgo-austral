@@ -23,8 +23,8 @@ RAIZ = Path(__file__).resolve().parent.parent
 CSV_SP500 = RAIZ / "datos" / "clase6_sp500_ohlc_yahoo.csv"
 CSV_FRED = RAIZ / "datos" / "clase6_fred_series.csv"
 SERIES_FRED = {"VIXCLS": "vix", "T10Y2Y": "spread_10y2y"}
-TIMEOUT = 45
-INTENTOS = 3
+TIMEOUT = 20
+INTENTOS = 2
 
 
 def _yahoo(ticker: str, columnas) -> pd.DataFrame:

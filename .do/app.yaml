@@ -14,6 +14,6 @@ services:
     instance_count: 1
     instance_size_slug: apps-s-1vcpu-0.5gb   # la instancia más chica (~USD 5/mes)
     health_check:
-      http_path: /salud
+      http_path: /
       initial_delay_seconds: 20
-      timeout_seconds: 30
+      timeout_seconds: 60

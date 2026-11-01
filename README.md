@@ -19,17 +19,17 @@ Servicio web que devuelve la probabilidad de que el **S&P 500 se mueva más de 2
 Ejemplo:
 
 ```bash
-curl https://<tu-app>.ondigitalocean.app/prediccion/2020-03-09
+curl https://api-riesgo-austral-kzmr7.ondigitalocean.app/prediccion/2020-03-09
 ```
 
 ```python
 import requests
-requests.get("https://<tu-app>.ondigitalocean.app/prediccion/hoy").json()
+requests.get("https://api-riesgo-austral-kzmr7.ondigitalocean.app/prediccion/hoy").json()
 ```
 
 ## Cómo funciona
 
-1. **Datos:** S&P 500 (cierre, máximo y mínimo) desde 1990 de Yahoo Finance; VIX y pendiente 10Y–2Y de FRED. Se guardan en memoria 6 horas. Si la descarga falla, se usa el CSV congelado de `datos/` y la respuesta lo avisa en `aviso_datos`.
+1. **Datos:** S&P 500 (cierre, máximo y mínimo) desde 1990 de Yahoo Finance; VIX y pendiente 10Y–2Y de FRED. Se guardan en memoria 6 horas. Si FRED no responde, el VIX nuevo se toma de Yahoo (`^VIX`) y la pendiente queda en su último valor congelado; si falla todo, se usa el CSV congelado de `datos/`. En cualquier plan B, la respuesta lo avisa en `aviso_datos` y se reintenta a los 15 minutos.
 2. **Features:** `app/features.py`, el **mismo archivo** que usa el notebook de entrenamiento (33 features de la Clase 6).
 3. **Modelo:** `modelo/modelo_movimiento.json` (XGBoost, formato nativo) y `modelo/meta.json` (ficha del modelo). Los genera la sección 8 del notebook `07_hiperparametros_y_produccion_colab.ipynb`.
 

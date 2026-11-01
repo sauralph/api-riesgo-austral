@@ -42,6 +42,13 @@ cache = CacheDatos()
 _predicciones = {"clave": None, "tabla": None}
 
 
+@app.on_event("startup")
+def precargar():
+    """Descarga los datos en segundo plano al arrancar: el servidor responde de inmediato."""
+    import threading
+    threading.Thread(target=lambda: tabla_predicciones(), daemon=True).start()
+
+
 def tabla_predicciones():
     """Calcula features y probabilidades para toda la historia (se recalcula al refrescar los datos)."""
     datos, fuente, error = cache.obtener()
