@@ -29,7 +29,7 @@ requests.get("https://api-riesgo-austral-kzmr7.ondigitalocean.app/prediccion/hoy
 
 ## Cómo funciona
 
-1. **Datos:** S&P 500 (cierre, máximo y mínimo) desde 1990 de Yahoo Finance; VIX y pendiente 10Y–2Y de FRED. Se guardan en memoria 6 horas. Si FRED no responde, el VIX nuevo se toma de Yahoo (`^VIX`) y la pendiente queda en su último valor congelado; si falla todo, se usa el CSV congelado de `datos/`. En cualquier plan B, la respuesta lo avisa en `aviso_datos` y se reintenta a los 15 minutos.
+1. **Datos:** S&P 500 (cierre, máximo y mínimo) desde 1990 de Yahoo Finance; VIX y pendiente 10Y–2Y de FRED. FRED publica el VIX con un día de demora, así que los días que todavía no publicó se completan con Yahoo (`^VIX`). Se guardan en memoria 6 horas. Si FRED no responde (pasa seguido desde servidores en la nube), se usan sus valores congelados en `datos/` y la pendiente queda en su último valor; si falla Yahoo, se usa todo el CSV congelado. En cualquier plan B, la respuesta lo avisa en `aviso_datos` y se reintenta a los 15 minutos.
 2. **Features:** `app/features.py`, el **mismo archivo** que usa el notebook de entrenamiento (33 features de la Clase 6).
 3. **Modelo:** `modelo/modelo_movimiento.json` (XGBoost, formato nativo) y `modelo/meta.json` (ficha del modelo). Los genera la sección 8 del notebook `07_hiperparametros_y_produccion_colab.ipynb`.
 

@@ -1,11 +1,11 @@
 """Descarga de datos de mercado para la API (misma lógica que el notebook).
 
 - S&P 500 (cierre, máximo, mínimo): Yahoo Finance (^GSPC), desde 1990.
-- VIX y pendiente 10Y-2Y: FRED (CSV público, sin API key).
-Plan B, si una fuente falla:
-- VIX: Yahoo Finance (^VIX, mismo cierre de CBOE).
-- Pendiente 10Y-2Y: último valor del CSV congelado, arrastrado hacia adelante (se avisa).
-- Todo: CSV congelado del repositorio (se avisa).
+- VIX: historia de FRED + los días que FRED todavía no publicó (~1 día de demora), desde Yahoo (^VIX).
+- Pendiente 10Y-2Y: FRED (CSV público, sin API key).
+Plan B, si una fuente falla (siempre se avisa en la respuesta):
+- FRED no responde: VIX y pendiente del CSV congelado; el VIX se completa con Yahoo.
+- Yahoo no responde: todo desde el CSV congelado del repositorio.
 """
 import io
 import logging
@@ -75,15 +75,16 @@ def cargar_en_vivo():
     spx = _yahoo("^GSPC", ["high", "low", "close"])
     congelado = pd.read_csv(CSV_FRED, index_col="date", parse_dates=True)
     columnas = {}
+    # VIX: historia de FRED (la del entrenamiento) + los días que FRED todavía no publicó, desde Yahoo.
+    # FRED publica el VIX con ~1 día de demora; el ^VIX histórico de Yahoo difiere de FRED en algunos
+    # días viejos (otro caso de skew), por eso Yahoo sólo completa las fechas nuevas.
     try:
-        columnas["vix"] = _fred("VIXCLS")
+        historia = _fred("VIXCLS").dropna()
     except Exception as exc:
-        # Historia: la de FRED congelada (con la que se entrenó). Sólo las fechas nuevas vienen de Yahoo:
-        # el ^VIX histórico de Yahoo difiere del de FRED en algunos días (otro caso de skew).
         historia = congelado["vix"].dropna()
-        nuevo = _yahoo("^VIX", ["close"])["close"].loc[lambda s: s.index > historia.index[-1]]
-        columnas["vix"] = pd.concat([historia, nuevo])
-        avisos.append(f"VIX posterior al {historia.index[-1].date()} desde Yahoo (^VIX) porque falló {exc}")
+        avisos.append(f"VIX de FRED congelado al {historia.index[-1].date()} porque falló {exc}")
+    nuevo = _yahoo("^VIX", ["close"])["close"].loc[lambda s: s.index > historia.index[-1]]
+    columnas["vix"] = pd.concat([historia, nuevo])
     try:
         columnas["spread_10y2y"] = _fred("T10Y2Y")
     except Exception as exc:
