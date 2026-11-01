@@ -1,0 +1,19 @@
+# Especificación de DigitalOcean App Platform.
+# Crear la app:   doctl apps create --spec .do/app.yaml
+# (o desde el panel: Create App -> GitHub -> este repositorio; App Platform detecta Python solo)
+name: api-riesgo-austral
+region: nyc
+services:
+  - name: api
+    git:
+      repo_clone_url: https://github.com/sauralph/api-riesgo-austral.git
+      branch: main
+    environment_slug: python
+    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8080
+    http_port: 8080
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-0.5gb   # la instancia más chica (~USD 5/mes)
+    health_check:
+      http_path: /salud
+      initial_delay_seconds: 20
+      timeout_seconds: 30
