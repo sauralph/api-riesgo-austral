@@ -3,7 +3,7 @@ fastapi==0.162.0
 uvicorn[standard]==0.54.0
 pandas==3.1.0
 numpy==2.5.4
-xgboost==3.4.1
+xgboost-cpu==3.4.1          # misma librería sin soporte de GPU (imagen ~300 MB más liviana)
 scikit-learn==1.9.1
 yfinance==1.7.0
 requests==2.34.2
